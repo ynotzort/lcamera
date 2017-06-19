@@ -684,11 +684,11 @@ class MainActivity extends SActivity with Observable {
     val focus = Rx[Focus] { if (autoFocus()) AutoFocus else new ManualFocus(focusDistance()) }
 
     val autoExposure = Var(true)
-    val isos = Vector(40, 50, 80, 100, 200, 300, 400, 600, 800, 1000, 1600, 2000, 3200, 4000, 6400, 8000, 10000)
+    val isos = Vector(40, 50, 60, 80, 100, 200, 300, 400, 600, 800, 1000, 1600, 2000, 3200, 4000, 6400, 8000, 10000)
     val validIsos = Rx { lcamera().toList flatMap { camera => isos filter { camera.isoRange contains _ }} }
     val iso = Var(100)
-    val exposureTimes = Vector[Double](1.2, 2, 4, 6, 8, 15, 30, 60, 100, 125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 20000, 30000, 75000) map { d => (1000000000l / d).toLong }
-    val validExposureTimes = Rx { lcamera().toList flatMap { camera => exposureTimes filter { camera.exposureTimeRange contains _ }} }
+    val exposureTimes = Vector[Double](1/5.0, 1/4.0, 1/3.0 ,1/2.0 ,1/1.5 ,1, 1.2, 2, 4, 6, 8, 15, 30, 60, 100, 125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 20000, 30000, 75000) map { d => (1000000000l / d).toLong }
+    val validExposureTimes = Rx { lcamera().toList flatMap { camera => exposureTimes filter { k => true  }} } //camera.exposureTimeRange contains _
     val exposureTime = Var(1000000000l / 30)
     val exposure = Rx[Exposure] { if (autoExposure()) AutoExposure else new ManualExposure(exposureTime(), iso()) }
 
@@ -1212,7 +1212,7 @@ class MainActivity extends SActivity with Observable {
     prefs.Float.focusDistance.foreach { focusDistance() = _ }
     prefs.Boolean.autoExposure.foreach { autoExposure() = _ }
     prefs.Int.iso.foreach { iso() = _ }
-    prefs.Long.exposureTime.foreach { exposureTime() = _ }
+    //prefs.Long.exposureTime.foreach { exposureTime() = _ } //prevent crash
     prefs.Int.numBursts.foreach { numBursts() = _ }
     prefs.Int.exposureBracketing.foreach { exposureBracketing() = _ }
     for { vcWidth <- prefs.Int.vcWidth
