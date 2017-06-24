@@ -19,10 +19,10 @@ libraryDependencies ++= Seq(
 platformTarget in Android := "android-21"
 
 proguardCache in Android ++=
-  Seq ( ProguardCache("org.scaloid") % "org.scaloid" %% "scaloid"
-      , ProguardCache("rx") % "com.scalarx" %% "scalarx"
-      , ProguardCache("akka") % "com.typesafe.akka" %% "akka-actor"
-      )
+  Seq (	"scaloid",
+		"rx",
+		"akka"
+	  )
 
 proguardOptions in Android ++=
   Seq ( "-dontobfuscate"
@@ -37,5 +37,3 @@ scalacOptions in Compile ++= Seq("-feature", "-deprecation")
 run <<= run in Android
 
 install <<= install in Android
-
-Keys.`package` <<= `packageT` in Android

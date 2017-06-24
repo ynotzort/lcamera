@@ -109,6 +109,9 @@ To build the app (the resulting APK will be placed in the `bin/` directory):
 
     $ sbt package
 
+I (enryea123) have removed the "package" command because I had problems with it, so just compile with 
+the following command "sbt run" (don't worry if your device is not connected, you will still get the apk)
+
 To build and run the app on device (assuming you have `adb` and developer mode enabled):
 
     $ sbt run

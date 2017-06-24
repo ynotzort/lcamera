@@ -414,9 +414,9 @@ class MainActivity extends SActivity with Observable {
   val isoIndex = Var(3) // ISO 100
   val iso = isoIndex.map(isoMap)
   val autoIso = Var(100)
-  val exposureTimeMap = Vector[Double](1.2, 2, 4, 6, 8, 15, 30, 60, 100, 125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 20000, 30000, 75000)
-  val exposureTimeIndex = Var(7) // 1/60s
-  val exposureTime = Rx { (1000000000.0 / exposureTimeMap(exposureTimeIndex())).toLong }
+  val exposureTimeMap = Vector[Double](12, 15, 20, 30, 40, 60, 120, 258, 360, 600, 900, 1800, 2700, 3600, 4500, 5400, 9000, 60000, 4500000, 7200000)
+  val exposureTimeIndex = Var(10) // 1/10s
+  val exposureTime = Rx { (60000000000.0 / exposureTimeMap(exposureTimeIndex())).toLong }
   val autoExposureTime = Var(1000000000l)
   val metering = Var(false)
 
@@ -690,7 +690,8 @@ class MainActivity extends SActivity with Observable {
 
     += (mkButton(Prev, { exposureTimeIndex() = Math.max(exposureTimeIndex() - 1, 0) }).<<(32.dip, 32.dip).>>)
     += (new STextView {
-      observe { exposureTimeIndex foreach { v => text = s"1/${new DecimalFormat("#.#").format(exposureTimeMap(v))}" } }
+	  observe { exposureTimeIndex foreach { v => text = if (v > 5) s"1/${new DecimalFormat("#.#").format(exposureTimeMap(v)/60)} s" else s"${new DecimalFormat("#.#").format(60/exposureTimeMap(v))} s" } }
+
       observe { autoExposure foreach { ae => textColor = if (ae) Color.parseColor("#d0d0d0") else Color.parseColor("#000000") } }
     }.padding(4.dip, 16.dip, 4.dip, 16.dip).wrap)
     += (mkButton(Next, { exposureTimeIndex() = Math.min(exposureTimeMap.length - 1, exposureTimeIndex() + 1) }).<<(32.dip, 32.dip).>>)
@@ -1080,7 +1081,7 @@ class MainActivity extends SActivity with Observable {
     prefs.focusDistance = focusDistance()
     prefs.autoExposure = autoExposure()
     prefs.isoIndex = isoIndex()
-    prefs.exposureTimeIndex = exposureTimeIndex()
+    //prefs.exposureTimeIndex = exposureTimeIndex()
     prefs.burst = burst()
     prefs.focusStacking = focusStacking()
     prefs.exposureBracketing = exposureBracketing()
