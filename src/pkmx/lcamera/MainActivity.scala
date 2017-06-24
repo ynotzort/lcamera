@@ -722,6 +722,31 @@ class MainActivity extends SActivity with Observable {
       onCheckedChanged { (v: CompoundButton, checked: Boolean) => burst() = if (checked) 7 else 1 }
     }.padding(8.dip, 16.dip, 8.dip, 16.dip).wrap)
 
+    sealed trait PrevNext
+    case object Prev extends PrevNext
+    case object Next extends PrevNext
+    def mkButton(pv: PrevNext, f: => Unit) = new SImageView {
+      backgroundResource = resolveAttr(android.R.attr.selectableItemBackground)
+      observe { autoExposure.foreach { ae =>
+        enabled = !ae
+        imageDrawable = (pv, ae) match {
+          case (Prev, false) => R.drawable.ic_navigation_previous_item
+          case (Prev, true) => R.drawable.ic_navigation_previous_item_disabled
+          case (Next, false) => R.drawable.ic_navigation_next_item
+          case (Next, true) => R.drawable.ic_navigation_next_item_disabled
+        }
+      }}
+
+      onClick(f)
+    }
+
+    += (mkButton(Prev, { burst() = Math.max(burst() - 1, 1) }).<<(32.dip, 32.dip).>>)
+    += (new STextView {
+      observe { burst foreach { v => text =  s"${new DecimalFormat("#").format(burst())}" } }
+
+    }.padding(4.dip, 16.dip, 4.dip, 16.dip).wrap)
+    += (mkButton(Next, { burst() = Math.min(65 - 1, burst() + 1) }).<<(32.dip, 32.dip).>>)
+
     += (new SCheckBox {
       text = "Focus Stack"
       observe { focusStacking foreach { setChecked } }
@@ -1081,7 +1106,6 @@ class MainActivity extends SActivity with Observable {
     prefs.focusDistance = focusDistance()
     prefs.autoExposure = autoExposure()
     prefs.isoIndex = isoIndex()
-    //prefs.exposureTimeIndex = exposureTimeIndex()
     prefs.burst = burst()
     prefs.focusStacking = focusStacking()
     prefs.exposureBracketing = exposureBracketing()
