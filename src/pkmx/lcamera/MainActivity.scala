@@ -104,7 +104,7 @@ object Utils {
     setVideoSize(vc.width, vc.height)
     setVideoEncodingBitRate(vc.bitrate)
     setVideoFrameRate(vc.fps)
-    setOrientationHint(orientationToDegree(orientation))
+    setOrientationHint((orientation))
     setOutputFile(tmpFilePath)
     setVideoEncoder(2) // H264
     setAudioEncoder(3) // AAC
@@ -118,10 +118,10 @@ object Utils {
   def renameFile(src: String, dst: String) { new File(src).renameTo(new File(dst)) }
 
   def orientationToDegree(orientation: Int) = orientation match {
-    case Surface.ROTATION_0 => 90
-    case Surface.ROTATION_90 => 0
-    case Surface.ROTATION_180 => 270
-    case Surface.ROTATION_270 => 180
+    case Surface.ROTATION_0 => 0
+    case Surface.ROTATION_90 => 90
+    case Surface.ROTATION_180 => 180
+    case Surface.ROTATION_270 => 270
     case _ => 0
   }
 
@@ -231,7 +231,7 @@ class MainActivity extends SActivity with Observable {
         val time = new Time
         time.setToNow()
         val filePathBase = Utils.createPathIfNotExist(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Camera/") + time.format("IMG_%Y%m%d_%H%M%S")
-        val orientation = windowManager.getDefaultDisplay.getRotation
+        val orientation = (characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)-orientationToDegree(windowManager.getDefaultDisplay.getRotation) +360)%360
         val targetSurfaces =
           if (burst() > 1)
             burstSaveDngJpeg() match {
@@ -268,7 +268,7 @@ class MainActivity extends SActivity with Observable {
 
           if (targetSurfaces contains jpegSurface) {
             request.set(JPEG_QUALITY, 100.toByte)
-            request.set(JPEG_ORIENTATION, orientationToDegree(orientation))
+            request.set(JPEG_ORIENTATION, (orientation))
           }
 
           if (targetSurfaces contains rawSurface) {
@@ -410,7 +410,7 @@ class MainActivity extends SActivity with Observable {
   val autoFocus = Var(true)
   val focusDistance = Var(0f)
   val autoExposure = Var(true)
-  val isoMap = Vector(40, 50, 80, 100, 200, 300, 400, 600, 800, 1000, 1600, 2000, 3200, 4000, 6400, 8000, 10000)
+  val isoMap = Vector(40, 50, 60, 80, 100, 200, 300, 400, 600, 800, 1000, 1600, 2000, 3200, 4000, 6400, 8000, 10000)
   val isoIndex = Var(3) // ISO 100
   val iso = isoIndex.map(isoMap)
   val autoIso = Var(100)
