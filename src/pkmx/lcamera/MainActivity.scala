@@ -26,6 +26,7 @@ import android.media.ImageReader.OnImageAvailableListener
 import android.os._
 import android.text.format.Time
 import android.view._
+import android.media.ExifInterface
 import android.view.animation.{Animation, TranslateAnimation}
 import android.view.animation.Animation.AnimationListener
 import android.widget._
@@ -123,6 +124,13 @@ object Utils {
     case Surface.ROTATION_180 => 180
     case Surface.ROTATION_270 => 270
     case _ => 0
+  }
+  def degreeToOrientation(orientation: Int) = orientation match {
+    case 0 => ExifInterface.ORIENTATION_NORMAL
+    case 90 => ExifInterface.ORIENTATION_ROTATE_90
+    case 180 => ExifInterface.ORIENTATION_ROTATE_180
+    case 270 => ExifInterface.ORIENTATION_ROTATE_270
+    case _ => ExifInterface.ORIENTATION_NORMAL
   }
 
   def createPathIfNotExist(path: String): String = {
@@ -314,7 +322,7 @@ class MainActivity extends SActivity with Observable {
                   val image = rawImages.read
                   val result = rawResults.read
 
-                  val dngCreator = new DngCreator(characteristics, result).setOrientation(orientation)
+                  val dngCreator = new DngCreator(characteristics, result).setOrientation(degreeToOrientation(orientation))
                   val filePath = if (burst() > 1) s"${filePathBase}_$n.dng" else s"$filePathBase.dng"
                   dngCreator.writeImage(new FileOutputStream(filePath), image)
                   dngCreator.close()
